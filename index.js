@@ -1,10 +1,13 @@
-var app = require('express')();
+var express= require('express');
+var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var fs = require('fs');
 var request = require('request');
 var cheerio = require('cheerio');
-var port = process.env.port || 8080;
+var port = Number(process.env.PORT || 8080);
+
+console.log(port);
 
 var textURL = '';
 var imgURL = '';
