@@ -4,8 +4,7 @@ var io = require('socket.io')(http);
 var fs = require('fs');
 var request = require('request');
 var cheerio = require('cheerio');
-var port = process.env.OPENSHIFT_NODEJS_PORT || 8080;
-var ip = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
+var port = process.env.port || 8080;
 
 var textURL = '';
 var imgURL = '';
@@ -84,6 +83,6 @@ io.on('connection', function(socket){
         io.emit('chat message', msg);
   });
 });
-http.listen(port, ip, function(){
+http.listen(port, function(){
   console.log('listening on *:3000');
 });
