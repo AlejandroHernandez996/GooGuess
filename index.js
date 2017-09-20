@@ -5,9 +5,10 @@ var io = require('socket.io')(http);
 var fs = require('fs');
 var request = require('request');
 var cheerio = require('cheerio');
-var port = Number(process.env.PORT || 8080);
 
-console.log(port);
+app.set('port', (process.env.PORT || 5000));
+app.use(express.static(__dirname + '/public'))
+
 
 var textURL = '';
 var imgURL = '';
@@ -84,6 +85,6 @@ io.on('connection', function(socket){
         io.emit('chat message', msg);
   });
 });
-http.listen(port, function(){
-  console.log('listening on *:3000');
+http.listen(app.get('port'), function() {
+  console.log('Node app is running on port', app.get('port'));
 });
