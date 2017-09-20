@@ -7,8 +7,9 @@ var request = require('request');
 var cheerio = require('cheerio');
 
 app.set('port', (process.env.PORT || 5000));
+app.set('ip',(process.env.IP || 'localhost'));
 app.use(express.static(__dirname + '/'));
-var server = app.listen(app.get('port'), function() {
+var server = app.listen(app.get('port'),app.get('ip'), function() {
   console.log('Node app is running on port', app.get('port'));
 });
 var io = require('socket.io').listen(server);
