@@ -1,14 +1,17 @@
 var express= require('express');
 var app = express();
 var http = require('http').Server(app);
-var io = require('socket.io')(http);
+
 var fs = require('fs');
 var request = require('request');
 var cheerio = require('cheerio');
 
 app.set('port', (process.env.PORT || 5000));
 app.use(express.static(__dirname + '/public'))
-
+var server = app.listen(app.get('port'), function() {
+  console.log('Node app is running on port', app.get('port'));
+});
+var io = require('socket.io').listen(server);
 
 var textURL = '';
 var imgURL = '';
@@ -84,7 +87,4 @@ io.on('connection', function(socket){
     else
         io.emit('chat message', msg);
   });
-});
-http.listen(app.get('port'), function() {
-  console.log('Node app is running on port', app.get('port'));
 });
