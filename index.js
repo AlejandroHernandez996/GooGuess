@@ -13,6 +13,9 @@ var title ='Google';
 
 var key = 'Google';
 
+http.listen(port, function(){
+  console.log('listening on *:3000');
+});
 //Home page is index.html
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
@@ -80,7 +83,4 @@ io.on('connection', function(socket){
     else
         io.emit('chat message', msg);
   });
-});
-http.listen(port, function(){
-  console.log('listening on *:3000');
 });
