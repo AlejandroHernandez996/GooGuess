@@ -24,7 +24,7 @@ var key = 'Google';
 //Home page is index.html
 
 app.get('/', function(req, res){
-  response.render('pages/index');
+  response.render('index.html');
 });
 
 io.on('connection', function(socket){
