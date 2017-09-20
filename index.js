@@ -80,7 +80,7 @@ io.on('connection', function(socket){
     else if(msg.substring(0,3) == '/g '){
 
         var guess = msg.substring(4,msg.length).toLowerCase();
-        if(guess = key)
+        if(guess == key)
             io.emit('chat message', 'Correct. ' + key + ' is the answer.');
         else 
             console.log("Incorrect");
