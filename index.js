@@ -4,7 +4,7 @@ var io = require('socket.io')(http);
 var fs = require('fs');
 var request = require('request');
 var cheerio = require('cheerio');
-var port = 8080 || process.env.PORT;
+var port = process.env.PORT;
 var textURL = '';
 var imgURL = '';
 
