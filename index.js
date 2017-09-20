@@ -16,13 +16,8 @@ var imgLink = 'https://yt3.ggpht.com/-v0soe-ievYE/AAAAAAAAAAI/AAAAAAAAAAA/OixOH_
 var title ='Google';
 
 var key = 'Google';
-
-
 //Home page is index.html
-app.get('/', function(req, res){
-  res.sendFile(__dirname + '/index.html');
-});
-
+app.use(express.static(__dirname));
 
 io.on('connection', function(socket){
 
