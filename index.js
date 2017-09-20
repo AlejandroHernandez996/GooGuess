@@ -4,7 +4,7 @@ var io = require('socket.io')(http);
 var fs = require('fs');
 var request = require('request');
 var cheerio = require('cheerio');
-
+var port = process.env.PORT || 3000;
 var textURL = '';
 var imgURL = '';
 
@@ -81,6 +81,6 @@ io.on('connection', function(socket){
         io.emit('chat message', msg);
   });
 });
-http.listen(3000 || process.env.PORT, function(){
+http.listen(port, function(){
   console.log('listening on *:3000');
 });
