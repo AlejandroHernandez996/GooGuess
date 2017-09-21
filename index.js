@@ -21,6 +21,7 @@ var imgLink = 'https://yt3.ggpht.com/-v0soe-ievYE/AAAAAAAAAAI/AAAAAAAAAAA/OixOH_
 var title ='Google';
 
 var key = 'Google';
+var answer = "";
 
 //Home page is index.html
 
@@ -30,7 +31,7 @@ app.get('/', function(req, res){
 
 io.on('connection', function(socket){
 
-    io.emit('update', title,imgLink);
+    io.emit('update', answer,imgLink);
 
     socket.on('chat message', function(msg){
         if(msg.substring(0,3) == '/s '){
@@ -57,8 +58,22 @@ io.on('connection', function(socket){
                     
                 });
                 console.log("Search: " + title);
+                
+                answer = "";
+                
+                for(var x =0;x <key.length;x++){
+                    
+                    if(x == 0 || key.charAt(x-1) == " ")
+                        answer+=key.charAt(x).toUpperCase() + " ";
+                    else if(key.charAt(x) == " ")
+                        answer += "__ ";
+                    else{
+                        answer += "_ ";
+                    }
+                    
+                }
 
-                io.emit('title search', title);
+                io.emit('title search', answer);
             }
         });
         request(imgURL, function(error, response, html){
@@ -79,8 +94,10 @@ io.on('connection', function(socket){
     }
     else if(msg.substring(0,3) == '/g '){
 
-        var guess = msg.substring(4,msg.length).toLowerCase();
-        if(guess == key)
+        var guess = msg.substring(3,msg.length).toLowerCase();
+        console.log(guess);
+        console.log(key);
+        if(guess == key.toLowerCase())
             io.emit('chat message', 'Correct. ' + key + ' is the answer.');
         else 
             console.log("Incorrect");
