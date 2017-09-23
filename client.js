@@ -1,21 +1,23 @@
 $(function () {
         var socket = io();
+
         $('form').submit(function(){
-            socket.emit('chat message', $('#m').val());
-            $('#m').val('');
-            return false;
+          socket.emit('chat message', $('#m').val());
+          $('#m').val('');
+          return false;
         });
+
         socket.on('chat message', function(msg){
-            $('#messages').append($('<li>').text(msg));
+          $('#messages').append($('<li>').text(msg));
+          window.scrollTo(0, document.body.scrollHeight);
         });
-        socket.on('title search', function(title){
-            document.getElementById("search").innerHTML = title;
+
+        socket.on('title update', function(title){
+            document.getElementById("title").innerHTML = title;
         });
-        socket.on('image search', function(link){
-            document.getElementById("image").src = link;
-        });
+
         socket.on('update',function(title,link){
-            document.getElementById("search").innerHTML = title;
+            document.getElementById("title").innerHTML = title;
             document.getElementById("image").src = link;
         });
     });

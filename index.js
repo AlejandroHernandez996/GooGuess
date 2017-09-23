@@ -1,13 +1,9 @@
 var express= require('express');
 var app = express();
-var http = require('http').Server(app);
-
-var fs = require('fs');
-var request = require('request');
-var cheerio = require('cheerio');
+var util = require("./util.js");
 
 const GoogleImages = require('google-images');
-const client = new GoogleImages('007676027972813459848:y8getabobpu', 'AIzaSyAL0S3myTz9tPyfOMw-LmNgXOZmAa_DPhA');
+const client = new GoogleImages('007676027972813459848:y8getabobpu', 'AIzaSyBhhob_fKmTFkQHtF6ThNHfHt_3hxW7vzw');
 
 app.set('port', (process.env.PORT || 5000));
 app.set('ip',(process.env.IP || 'localhost'));
@@ -19,16 +15,61 @@ var server = app.listen(app.get('port'),app.get('ip'), function() {
 
 var io = require('socket.io').listen(server);
 
-// Link variables
-var imgURL = '';
-var imgLink = 'https://yt3.ggpht.com/-v0soe-ievYE/AAAAAAAAAAI/AAAAAAAAAAA/OixOH_h84Po/s900-c-k-no-mo-rj-c0xffffff/photo.jpg';
+// CONSTANTS
+const SEARCH_COMMAND    = '/s';
+const GUESS_COMMAND     = '/g';
+const SET_COLOR         = '/c';
+const SET_USER          = '/u';
+const MAX_USER          = 10;
+const MIN_USER          = 2;
+const MAX_SEARCH        = 20;
+const MIN_SEARCH        = 3;
 
-// Searched term
-var key = 'Google';
-// Displayed key for guessing
-var answer = "G _ _ _ _ _";
-// Status if the key was guessed
+// Game variables
+var imgLink = "";
+var key = "Goo Guess";
+var answer = "";
 var isGuessed = false;
+
+if(imgLink == ""){
+    searchImage();
+    setAnswer();
+}
+    
+
+// All commands
+const COMMANDS = [
+    {
+        text : SEARCH_COMMAND,
+        action : function(param){
+
+            console.log(param);
+            isGuessed = false;
+            key = param;
+            //Search google image of key
+            //Emit image
+            searchImage();
+            //Emit answer
+            setAnswer();
+            
+        }
+
+    },
+    {
+        text : GUESS_COMMAND,
+        action : function(param){
+
+            console.log(param);
+            // Check if correct
+            if(param.toLowerCase() == key.toLowerCase())
+                isGuessed = true;
+            // Emit key if correct
+            if(isGuessed)
+                io.emit('title update', key);     
+        }
+
+    }
+];
 
 //Home page is index.html
 
@@ -46,23 +87,22 @@ io.on('connection', function(socket){
         io.emit('update', answer, imgLink);
 
     socket.on('chat message', function(msg){
+        for(var x = 0;x < COMMANDS.length; x++){
+            if(util.parseCommand(COMMANDS[x], {text: msg}))
+                return;
+        }
+        if(msg.trim() !== ' '){
+            emitChatMessage(msg);
+        }   
         
-        //SEARCH COMMAND /s SEARCHTERM
-        if(msg.substring(0,3) == '/s '){
-            
-            //Set guessed to false
-            isGuessed = false;
-            // Key is lowered case
-            key = msg.substring(3,msg.length);
-        
-        client.search(key).then(images => {
-            console.log(images[0].url);
-            io.emit('image search', images[0].url);
-        });
-        
-        answer = "";
-                
-        for(var x =0;x <key.length;x++){
+    });
+    
+});
+// Set the answer
+function setAnswer(){
+
+    answer = "";
+    for(var x =0;x <key.length;x++){
                     
         if(x == 0 || key.charAt(x-1) == " "){
             answer+=key.charAt(x).toUpperCase() + " ";
@@ -72,33 +112,19 @@ io.on('connection', function(socket){
             }
                     
         }
-        io.emit('title search', answer);
-        
-    }
-    // GUESS COMMAND /g GUESSKEYWORD
-    else if(msg.substring(0,3) == '/g '){
 
-        // Get the guessed keyword
-        var guess = msg.substring(3,msg.length).toLowerCase();
-        console.log(guess);
-        console.log(key);
-        
-        // If guess equals key 
-        if(guess.toLowerCase() == key.toLowerCase()){
-            
-            // Emit to chat
-            io.emit('chat message', 'Correct. ' + key + ' is the answer.');
-            // Emit key to website on top
-            io.emit('title search', key);
-            // Set guessed to true
-            isGuessed = true;
-        }
-        else 
-            console.log("Incorrect");
+}
 
-    }
-    // ELSE EMIT MESSAGE TO CHAT
-    else if(msg.charAt(0) != '/')
-        io.emit('chat message', msg);
-  });
-});
+function emitChatMessage(msg){
+    io.emit('chat message', msg);
+}
+function emitImage(){
+    io.emit('update', answer,imgLink); 
+}
+function searchImage(){
+    client.search(key).then(images => {
+                var rand = Math.floor((Math.random() * images.length));
+                imgLink = images[rand].url;
+                emitImage();
+            });
+}
