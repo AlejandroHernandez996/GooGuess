@@ -31,6 +31,9 @@ var key = "Goo Guess";
 var answer = "";
 var isGuessed = false;
 
+var numUsers = 0;
+
+
 if(imgLink == ""){
     searchImage();
     setAnswer();
@@ -59,7 +62,6 @@ const COMMANDS = [
         text : GUESS_COMMAND,
         action : function(param){
 
-            console.log(param);
             // Check if correct
             if(param.toLowerCase() == key.toLowerCase())
                 isGuessed = true;
@@ -68,6 +70,12 @@ const COMMANDS = [
                 io.emit('title update', key);     
         }
 
+    },
+    {
+        text : SET_USER,
+        action : function(param){
+
+        }
     }
 ];
 
@@ -91,7 +99,7 @@ io.on('connection', function(socket){
             if(util.parseCommand(COMMANDS[x], {text: msg}))
                 return;
         }
-        if(msg.trim() !== ' '){
+        if(msg != ""){
             emitChatMessage(msg);
         }   
         
