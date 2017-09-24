@@ -8,8 +8,7 @@ $(function () {
         });
 
         socket.on('chat message', function(msg){
-          $('#messages').append($('<li>').text(msg));
-          window.scrollTo(0, document.body.scrollHeight);
+          addMessage(msg);
         });
 
         socket.on('title update', function(title){
@@ -21,3 +20,13 @@ $(function () {
             document.getElementById("image").src = link;
         });
     });
+function addMessage (msg) {
+
+
+    var $messages = $('.messages');
+    var $messageBodyDiv = $('<span class="messageBody">').text(msg);
+    var $messageDiv = $('<li class="message"/>').append($messageBodyDiv);
+    
+    $messages.append($messageDiv);
+    $messages[0].scrollTop = $messages[0].scrollHeight;
+  }
