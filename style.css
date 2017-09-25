@@ -21,6 +21,11 @@ form button {
     float: right;
     right: 0%;
     width: 15%;
+    border-style: solid;
+    border-width: 2px;
+    border-color: black;
+    background-color: white;
+
 }
 #main{
     width: 100%;
@@ -34,12 +39,16 @@ form button {
     position: relative;
 }
 #imageContainer{
-    margin-left: 20%;
-    margin-right: 20%;
+    margin-left: 15%;
+    width: 50%;
+    height: 50%;
+    border-style: solid;
+    border-width: 10px;
 }
 #image{
-    width: 75%;
-    height: 75%;
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 #title{
     width: 80%;
@@ -48,6 +57,9 @@ form button {
     text-align: center;
 }
 #chat{
+    border-style: solid;
+    border-left-width: 2px;
+    border-top-width: 0px;
     float:left; 
     width: 30%;
     background-color: lightsteelblue;
@@ -56,7 +68,7 @@ form button {
 }
 .messages{
     position: relative;
-    height: 95.5%;
+    height: 90%;
     max-height: inherit;
     overflow-y: auto;
     padding: 15px 2px;
@@ -64,11 +76,27 @@ form button {
     color: white;
     left: 5%;
 }
+#header{
+    background-color: olivedrab;
+    border-style: solid;
+    border-width: 2px;
+    border-right-width: 0px;
+    border-left-width: 0px;
+
+}
+#headerTitle{
+    text-align: center;
+    font-size: 30px;
+    color: white;
+}
 #m{
     float:left;
     padding: 5px;
     width: 85%;
+    height: 35px;
     max-width: 85%;
     max-height: 80px;
+    border-style: solid;
+    border-width: 2px;
 
 }
