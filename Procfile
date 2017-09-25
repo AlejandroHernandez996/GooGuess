@@ -1,1 +1,1 @@
-web : node --debug=5858 start
+web : node index.js
