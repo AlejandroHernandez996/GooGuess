@@ -65,7 +65,7 @@ const COMMANDS = [
 
             
             // Emit key if correct
-            if(!isGuessed){
+            if(!isGuessed && param.toLowerCase() == key.toLowerCase()){
                 io.emit('title update', key);
                 sender.score++;
                 for(var x =0;x < players.length;x++){
@@ -73,11 +73,9 @@ const COMMANDS = [
                         players[x].s = sender.score;
                     }
                 }
+                isGuessed = true;
                         
             }
-            // Check if correct
-            if(param.toLowerCase() == key.toLowerCase())
-                isGuessed = true;
             updateScore();
         }     
         

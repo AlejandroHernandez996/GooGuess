@@ -8,7 +8,7 @@ $(function () {
         });
 
         socket.on('chat message', function(sender, msg){
-          addMessage(sender + ": " + msg);
+          addMessage((sender + ": ") + msg);
         });
 
         socket.on('title update', function(title){
@@ -42,7 +42,7 @@ function updateScore(players){
     $scores.empty();
     for(var x =0;x < players.length && x < 5;x++){
 
-        var $scoresBodyDiv = $('<span class="scoreBody">').text(players[x].u + ": " + players[x].s);
+        var $scoresBodyDiv = $('<span class="scoreBody">').text((players[x].u + ": " + players[x].s));
         var $scoresDiv = $('<li class="score"/>').append($scoresBodyDiv);
         $scores.append($scoresDiv);
     }
