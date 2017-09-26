@@ -31,7 +31,7 @@ var key = "Goo Guess";
 var answer = "";
 var isGuessed = false;
 
-var numUsers = 0;
+var usernames = [];
 
 
 if(imgLink == ""){
@@ -44,23 +44,24 @@ if(imgLink == ""){
 const COMMANDS = [
     {
         text : SEARCH_COMMAND,
-        action : function(param){
+        action : function(param, sender){
 
-            console.log(param);
-            isGuessed = false;
-            key = param;
-            //Search google image of key
-            //Emit image
-            searchImage();
-            //Emit answer
-            setAnswer();
+             if(param.length <= MAX_SEARCH && param.length >= MIN_SEARCH){
+                isGuessed = false;
+                key = param;
+                //Search google image of key
+                //Emit image
+                searchImage();
+                //Emit answer
+                setAnswer();
+           }
             
         }
 
     },
     {
         text : GUESS_COMMAND,
-        action : function(param){
+        action : function(param, sender){
 
             // Check if correct
             if(param.toLowerCase() == key.toLowerCase())
@@ -73,7 +74,14 @@ const COMMANDS = [
     },
     {
         text : SET_USER,
-        action : function(param){
+        action : function(param, sender){
+
+            if(usernames.indexOf(param.toLowerCase()) != -1 || param.length >= MAX_USER || param.length <= MIN_USER){
+                return;
+            }else{
+                sender.username = param;
+                usernames.push(param.toLowerCase());
+            }
 
         }
     }
@@ -87,6 +95,8 @@ app.get('/', function(req, res){
 
 io.on('connection', function(socket){
     
+
+    socket.username = socket.id.substr(0,socket.id.length/2);
     //If it was guessed 
     if(isGuessed)
         io.emit('update', key, imgLink);
@@ -96,11 +106,11 @@ io.on('connection', function(socket){
 
     socket.on('chat message', function(msg){
         for(var x = 0;x < COMMANDS.length; x++){
-            if(util.parseCommand(COMMANDS[x], {text: msg}))
+            if(util.parseCommand(COMMANDS[x], {text: msg, sender: socket}))
                 return;
         }
         if(msg != ""){
-            emitChatMessage(msg);
+            emitChatMessage(msg, socket.username);
         }   
         
     });
@@ -123,8 +133,8 @@ function setAnswer(){
 
 }
 
-function emitChatMessage(msg){
-    io.emit('chat message', msg);
+function emitChatMessage(msg, sender){
+    io.emit('chat message', sender, msg);
 }
 function emitImage(){
     io.emit('update', answer,imgLink); 

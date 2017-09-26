@@ -2,18 +2,17 @@
 (function(exports){
     
     // Parses any commands
-    exports.parseCommand = function(command, message) {
+    exports.parseCommand = function(command, param) {
         
         // Get the text
-        var text = message.text;
-        console.log(text);
+        var commandText = param.text;
         // If text starts with command and space
-        if(text.toLowerCase().startsWith(command.text.toLowerCase() + " ")){
+        if(commandText.toLowerCase().startsWith(command.text.toLowerCase() + " ")){
 
             // Get the substring of the command
-            text = text.substring(command.text.length +1);
+            commandText = commandText.substring(command.text.length +1);
             // Do command
-            command.action(text);
+            command.action(commandText, param.sender);
             return true;
         }
         return false;

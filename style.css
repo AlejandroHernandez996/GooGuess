@@ -10,6 +10,7 @@ body {
 }
 form { 
     text-align: center;
+
 }
 form button { 
 
@@ -67,8 +68,9 @@ form button {
     position: absolute;
 }
 .messages{
+    
     position: relative;
-    height: 90%;
+    height: 92.5%;
     max-height: inherit;
     overflow-y: auto;
     padding: 15px 2px;

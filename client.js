@@ -7,8 +7,8 @@ $(function () {
           return false;
         });
 
-        socket.on('chat message', function(msg){
-          addMessage(msg);
+        socket.on('chat message', function(sender, msg){
+          addMessage(sender + ": " + msg);
         });
 
         socket.on('title update', function(title){
