@@ -32,7 +32,7 @@ var answer = "";
 var isGuessed = false;
 
 var usernames = [];
-
+var players =[];
 
 if(imgLink == ""){
     searchImage();
@@ -63,13 +63,24 @@ const COMMANDS = [
         text : GUESS_COMMAND,
         action : function(param, sender){
 
+            
+            // Emit key if correct
+            if(!isGuessed){
+                io.emit('title update', key);
+                sender.score++;
+                for(var x =0;x < players.length;x++){
+                    if(players[x].id == sender.id){
+                        players[x].s = sender.score;
+                    }
+                }
+                        
+            }
             // Check if correct
             if(param.toLowerCase() == key.toLowerCase())
                 isGuessed = true;
-            // Emit key if correct
-            if(isGuessed)
-                io.emit('title update', key);     
-        }
+            updateScore();
+        }     
+        
 
     },
     {
@@ -81,6 +92,12 @@ const COMMANDS = [
             }else{
                 sender.username = param;
                 usernames.push(param.toLowerCase());
+                for(var x =0;x < players.length;x++){
+                    if(players[x].id == sender.id){
+                        players[x].u = sender.username;
+                    }
+                }
+                updateScore();
             }
 
         }
@@ -95,15 +112,19 @@ app.get('/', function(req, res){
 
 io.on('connection', function(socket){
     
-
     socket.username = socket.id.substr(0,socket.id.length/2);
+    socket.score = 0;
+    socket.data = { id: socket.id, u:socket.username, s:socket.score};
+    players.push(socket.data);
+    updateScore();
     //If it was guessed 
-    if(isGuessed)
+    if(isGuessed){
         io.emit('update', key, imgLink);
+    }
     //Else update the key
     else if(!isGuessed)
         io.emit('update', answer, imgLink);
-
+    
     socket.on('chat message', function(msg){
         for(var x = 0;x < COMMANDS.length; x++){
             if(util.parseCommand(COMMANDS[x], {text: msg, sender: socket}))
@@ -113,6 +134,13 @@ io.on('connection', function(socket){
             emitChatMessage(msg, socket.username);
         }   
         
+    });
+    socket.on('disconnect',function(){
+        for(var x =0;x < players.length;x++){
+            if(players[x].id == socket.id)
+                players.splice(x,1);
+        }
+        updateScore();
     });
     
 });
@@ -145,4 +173,7 @@ function searchImage(){
                 imgLink = images[rand].url;
                 emitImage();
             });
+}
+function updateScore(){
+    io.emit('update score',players);
 }

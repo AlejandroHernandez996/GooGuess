@@ -70,13 +70,35 @@ form button {
 .messages{
     
     position: relative;
-    height: 92.5%;
+    height: 72.5%;
     max-height: inherit;
     overflow-y: auto;
     padding: 15px 2px;
     font-size: 15px;
     color: white;
     left: 5%;
+
+}
+.scores{
+
+    position: relative;
+    padding: 15px 2px;
+    font-size: 28px;
+    width: 50%;
+    max-height: inherit;
+    max-width: inherit;
+    color: white;
+    left: 10%;
+    list-style-type: decimal;
+}
+#scoreContainer{
+    height: 20%;
+    max-height: 20%;
+    position: relative;
+    overflow-y: auto;
+    background-color: lightcoral;
+    border-style: solid;
+    border-width: 2px;
 }
 #header{
     background-color: olivedrab;
