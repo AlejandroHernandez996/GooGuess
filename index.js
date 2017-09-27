@@ -45,6 +45,9 @@ const COMMANDS = [
     {
         text : SEARCH_COMMAND,
         action : function(param, sender){
+            resetSearcher();
+            // Set socket as the one who searched
+            sender.searcher = true;
 
              if(param.length <= MAX_SEARCH && param.length >= MIN_SEARCH){
                 isGuessed = false;
@@ -65,7 +68,7 @@ const COMMANDS = [
 
             
             // Emit key if correct
-            if(!isGuessed && param.toLowerCase() == key.toLowerCase()){
+            if(!isGuessed && param.toLowerCase() == key.toLowerCase() && !sender.searcher){
                 io.emit('title update', key);
                 sender.score++;
                 for(var x =0;x < players.length;x++){
@@ -73,9 +76,13 @@ const COMMANDS = [
                         players[x].s = sender.score;
                     }
                 }
+                // Cant be regussed
                 isGuessed = true;
+                // Anyone can guess
+                resetSearcher();
                         
             }
+            // Update score on a correct guess
             updateScore();
         }     
         
@@ -88,8 +95,14 @@ const COMMANDS = [
             if(usernames.indexOf(param.toLowerCase()) != -1 || param.length >= MAX_USER || param.length <= MIN_USER){
                 return;
             }else{
+                // Remove username from username array
+                for(var x =0;x < usernames.length;x++){
+                    if(usernames[x] == socket.username)
+                    usernames.splice(x,1);
+                }
                 sender.username = param;
                 usernames.push(param.toLowerCase());
+                // Set new username in players array
                 for(var x =0;x < players.length;x++){
                     if(players[x].id == sender.id){
                         players[x].u = sender.username;
@@ -108,13 +121,18 @@ app.get('/', function(req, res){
   res.sendFile('index.html');
 });
 
+// SOCKET CONNECTED
 io.on('connection', function(socket){
     
+    // SOCKET VARS
+    socket.searcher= false;
     socket.username = socket.id.substr(0,socket.id.length/2);
     socket.score = 0;
     socket.data = { id: socket.id, u:socket.username, s:socket.score};
+
     players.push(socket.data);
     updateScore();
+
     //If it was guessed 
     if(isGuessed){
         io.emit('update', key, imgLink);
@@ -123,6 +141,7 @@ io.on('connection', function(socket){
     else if(!isGuessed)
         io.emit('update', answer, imgLink);
     
+    // When a chat message occurs check if its a command or a msg
     socket.on('chat message', function(msg){
         for(var x = 0;x < COMMANDS.length; x++){
             if(util.parseCommand(COMMANDS[x], {text: msg, sender: socket}))
@@ -133,16 +152,21 @@ io.on('connection', function(socket){
         }   
         
     });
+    // When socket disconnects delete username and socket from arrays
     socket.on('disconnect',function(){
         for(var x =0;x < players.length;x++){
             if(players[x].id == socket.id)
                 players.splice(x,1);
         }
+        for(var x =0;x < usernames.length;x++){
+            if(usernames[x] == socket.username)
+                usernames.splice(x,1);
+        }
         updateScore();
     });
     
 });
-// Set the answer
+// Set the answer on the client
 function setAnswer(){
 
     answer = "";
@@ -159,12 +183,24 @@ function setAnswer(){
 
 }
 
+// Loop through all socket ids and set searcher to false
+function resetSearcher(){
+    var ids = Object.keys(io.sockets.connected);
+    ids.forEach(function(id) {
+        var socket = io.sockets.connected[id];
+        socket.searcher = false;
+
+    });
+}
+// Emit chat message to the client
 function emitChatMessage(msg, sender){
     io.emit('chat message', sender, msg);
 }
+// Emit image to the client
 function emitImage(){
     io.emit('update', answer,imgLink); 
 }
+// Using google API search for an image
 function searchImage(){
     client.search(key).then(images => {
                 var rand = Math.floor((Math.random() * images.length));
@@ -172,6 +208,7 @@ function searchImage(){
                 emitImage();
             });
 }
+// Update the scoreboard in the client
 function updateScore(){
     io.emit('update score',players);
 }

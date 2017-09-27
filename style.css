@@ -116,7 +116,12 @@ form button {
     text-align: center;
     font-size: 30px;
     color: white;
+    
 }
+a:link {
+    text-decoration: none;
+}
+
 #m{
     float:left;
     padding: 5px;
