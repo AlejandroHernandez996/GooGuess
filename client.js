@@ -15,8 +15,7 @@ $(function () {
             document.getElementById("title").innerHTML = title;
         });
 
-        socket.on('update',function(title,link){
-            document.getElementById("title").innerHTML = title;
+        socket.on('update',function(link){
             document.getElementById("image").src = link;
         });
         socket.on('update score',function(players){

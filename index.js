@@ -80,10 +80,12 @@ const COMMANDS = [
                 isGuessed = true;
                 // Anyone can guess
                 resetSearcher();
-                        
+                // Update score on a correct guess
+                updateScore();       
+            }else if(!isGuessed && param.toLowerCase() != key.toLowerCase() && !sender.searcher){
+                revealLetter();
             }
-            // Update score on a correct guess
-            updateScore();
+            
         }     
         
 
@@ -97,7 +99,7 @@ const COMMANDS = [
             }else{
                 // Remove username from username array
                 for(var x =0;x < usernames.length;x++){
-                    if(usernames[x] == socket.username)
+                    if(usernames[x] == sender.username)
                     usernames.splice(x,1);
                 }
                 sender.username = param;
@@ -136,10 +138,14 @@ io.on('connection', function(socket){
     //If it was guessed 
     if(isGuessed){
         io.emit('update', key, imgLink);
+        
     }
     //Else update the key
-    else if(!isGuessed)
-        io.emit('update', answer, imgLink);
+    else if(!isGuessed){
+        emitImage();
+        emitTitle(answer);
+    }
+        
     
     // When a chat message occurs check if its a command or a msg
     socket.on('chat message', function(msg){
@@ -172,14 +178,34 @@ function setAnswer(){
     answer = "";
     for(var x =0;x <key.length;x++){
                     
-        if(x == 0 || key.charAt(x-1) == " "){
-            answer+=key.charAt(x).toUpperCase() + " ";
+        if(x == 0){
+            answer+=key.charAt(x).toUpperCase();
+        }else if( key.charAt(x-1) == " "){
+            answer+=" " + key.charAt(x).toUpperCase();
         }
         else if(key.charAt(x) != ' ' ){
-            answer += "_ ";
+            answer += "_";
             }
                     
         }
+    emitTitle(answer);
+
+}
+function revealLetter(){
+    var temp = "";
+    var count = 0;
+    console.log(answer);
+    console.log(key);
+    for(var x =0;x < answer.length;x++){
+        if(answer[x] == '_' && count == 0){
+            temp += key[x];
+            count ++;
+        }else{
+            temp += answer[x];
+        }
+    }
+    answer = temp;
+    emitTitle(answer);   
 
 }
 
@@ -196,9 +222,17 @@ function resetSearcher(){
 function emitChatMessage(msg, sender){
     io.emit('chat message', sender, msg);
 }
+function emitTitle(msg){
+    var temp = "";
+    temp += msg[0];
+    for(var x =1;x < msg.length;x++){
+        temp += msg[x] + ' ';
+    }
+    io.emit('title update', temp.substr(0,temp.length-1));
+}
 // Emit image to the client
 function emitImage(){
-    io.emit('update', answer,imgLink); 
+    io.emit('update',imgLink); 
 }
 // Using google API search for an image
 function searchImage(){
@@ -206,6 +240,7 @@ function searchImage(){
                 var rand = Math.floor((Math.random() * images.length));
                 imgLink = images[rand].url;
                 emitImage();
+                emitTitle(answer);
             });
 }
 // Update the scoreboard in the client
