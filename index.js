@@ -191,6 +191,7 @@ function setAnswer(){
     emitTitle(answer);
 
 }
+// Reveals next letter in answer
 function revealLetter(){
     var temp = "";
     var count = 0;
